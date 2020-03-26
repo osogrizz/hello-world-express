@@ -1,38 +1,71 @@
-// const http = require('http');
-const express = require('express');
+const express = require('express')
 
-const port = 5000;
+const port = 5000
 
-const server = express();
+const server = express()
+server.use(express.json())
 
-// const server = http.createServer((req,res) => {
-//   res.statusCode = 200;
-//   res.setHeader('Contenty-Type', 'text-plain');
-//   res.end('Hellow World, from Node.js');
-// })
+server.get('/hobbits', (req, res) => {
+  console.log(req.query)
+  const sortField = req.query.sortby || 'id';
+  const hobbits = [
+    {
+      id: 1,
+      name: 'Samwise Gamgee',
+    },
+    {
+      id: 2,
+      name: 'Frodo Baggins',
+    },
+    {
+      id: 3,
+      name: 'Bilbo Baggins',
+    },
+  ];
 
-server.get('/', (req, res) => {
-  res.send('Hello World from Express!');
+  // apply the sorting
+  const response = hobbits.sort(
+    (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
+  );
+
+  res.status(200).json(response);
 });
 
-server.get('/hobbits', (req,res) => {
-  res.send('Welcome to Hobbiton');
-});
+let hobbits = [
+  {
+    id: 1,
+    name: 'Bilbo Baggins',
+    age: 111,
+  },
+  {
+    id: 2,
+    name: 'Frodo Baggins',
+    age: 33,
+  },
+];
+let nextId = 3;
 
 server.post('/hobbits', (req,res) => {
-  res.status(201).json({ url: '/hobbits', operation: 'POST' });
-});
+  console.log(req.body)
+  const hobbit = req.body
+  hobbit.id =nextId++
+
+  hobbits.push(hobbit)
+
+  res.status(201).json(hobbits)
+})
 
 server.put('/hobbits', (req,res) => {
-  res.status(200).json({ url: '/hobbits', operation: 'PUT' });
-});
+  res.status(200).json({ url: '/hobbits', operation: 'PUT' })
+})
 
-server.delete('/hobbits', (req,res) => {
-  res.sendStatus(204);
-});
-
-
-
+server.delete('/hobbits/:id', (req,res) => {
+  const {id} = req.params
+  res.status(200).json({
+    url: `/hobbits/${id}`,
+    operation: `Delete for the hobbit with id ${id}`
+  })
+})
 
 server.listen(port, () => {
   console.log(`server is listening on port ${port}`);
