@@ -5,6 +5,10 @@ const port = 5000
 const server = express()
 server.use(express.json())
 
+// custom middleware
+
+
+
 server.get('/hobbits', (req, res) => {
   console.log(req.query)
   const sortField = req.query.sortby || 'id';
@@ -70,6 +74,10 @@ server.delete('/hobbits/:id', (req,res) => {
     url: `/hobbits/${id}`,
     operation: `Delete for the hobbit with id ${id}`
   })
+})
+
+server.use(function(req,res) {
+  res.status(404).send(`Ain't nobody got time for dat!`)
 })
 
 server.listen(port, () => {
