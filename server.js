@@ -7,9 +7,34 @@ server.use(express.json())
 
 // custom middleware
 
+function logger(req, res, next) {
+  console.log(`[${new Date().toISOString()}] ${req.method} to ${req.url} ${req.get('Origin')}`)
+  next()
+}
 
+function atGate(req, res, next) {
+  console.log('At the gate about to be eaten')
+  next()
+}
 
-server.get('/hobbits', (req, res) => {
+function auth(req, res, next) {
+  if (req.url === '/mellon') {
+    next()
+  } else {
+    res.send('You shall not pass!')
+  }
+}
+
+server.use(logger)
+server.use(atGate)
+
+server.get('/mellon', auth, (req,res) => {
+  console.log('Gate opening...')
+  console.log('Inside and safe!')
+  res.send('Welcome Traveler!')
+})
+
+server.get('/hobbits', auth, (req, res) => {
   console.log(req.query)
   const sortField = req.query.sortby || 'id';
   const hobbits = [
